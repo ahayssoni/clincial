@@ -2,7 +2,7 @@
 
 **Last Updated:** 2025-12-23
 **Repository:** ahayssoni/clincial
-**Current Status:** Initial Bootstrap Phase
+**Current Status:** Production-Ready SaaS Platform
 
 ---
 
@@ -27,58 +27,98 @@
 **Repository URL:** ahayssoni/clincial
 **Initial Commit:** 2cc97f2 - December 12, 2025
 **Current Branch:** claude/add-claude-documentation-eaGrw
-**Project Stage:** Early initialization - project structure and technology stack to be determined
+**Project Type:** Full-Stack SaaS Platform
+**Tech Stack:** Next.js 14+, TypeScript, Prisma, PostgreSQL, Stripe
 
 ### Current State
 
-This repository is in its initial bootstrap phase. It currently contains:
-- Git configuration and metadata
-- Minimal README.md with project title only
-- This CLAUDE.md documentation file
+This repository is a production-ready SaaS platform with:
+- Next.js 14+ with App Router and TypeScript
+- Authentication system (NextAuth.js with email/password + Google OAuth)
+- PostgreSQL database with Prisma ORM
+- Stripe integration for subscriptions
+- Landing page, pricing page, and dashboard
+- Complete API routes for auth and payments
+- Tailwind CSS for styling
 
-**No technology stack has been chosen yet.** The project awaits initial setup and code implementation.
+**The platform is ready for customization and deployment.**
 
 ---
 
 ## Project Purpose
 
-> **Status:** To be defined
+**Clincial** is a modern, full-stack SaaS platform template designed to help businesses quickly launch subscription-based services. The platform provides:
 
-The project name "clincial" suggests a potential medical/clinical domain application, but the exact purpose, scope, and objectives have not yet been documented.
+- **Complete Authentication System** - User registration, login, and OAuth integration
+- **Subscription Management** - Stripe-powered payment processing and subscription handling
+- **User Dashboard** - Analytics, activity tracking, and account management
+- **Marketing Pages** - Professional landing page and pricing tiers
+- **Developer-Friendly** - TypeScript, modern frameworks, and comprehensive documentation
 
-**When defining the project:**
-- Update the README.md with a clear project description
-- Document the target users and use cases
-- Specify the problem being solved
-- Update this section with the project's mission and goals
+**Target Users:** Entrepreneurs and developers building SaaS products who need a solid foundation to start from rather than building everything from scratch.
+
+**Customization:** While "Clincial" is the current brand name, it's designed to be easily rebranded for any SaaS use case (project management, analytics, CRM, etc.).
 
 ---
 
 ## Codebase Structure
 
-> **Status:** Not yet established
-
-### Expected Structure (Template)
-
-Once the project begins development, document the directory structure here:
+The project follows Next.js 14+ App Router conventions:
 
 ```
 clincial/
-├── src/              # Source code (adjust based on chosen language)
-├── tests/            # Test files
-├── docs/             # Additional documentation
-├── config/           # Configuration files
-├── scripts/          # Build/deployment scripts
-├── .github/          # GitHub workflows and templates
-├── README.md         # Project overview and setup instructions
-├── CLAUDE.md         # This file - AI assistant guide
-└── [other files]     # Based on chosen technology stack
+├── app/                          # Next.js app directory
+│   ├── api/                      # API routes
+│   │   ├── auth/                 # Authentication endpoints
+│   │   │   ├── [...nextauth]/    # NextAuth.js handler
+│   │   │   └── register/         # User registration
+│   │   ├── create-checkout-session/  # Stripe checkout
+│   │   ├── create-portal-session/    # Stripe billing portal
+│   │   └── webhooks/
+│   │       └── stripe/           # Stripe webhook handler
+│   ├── auth/                     # Auth pages
+│   │   ├── signin/               # Sign in page
+│   │   └── signup/               # Sign up page
+│   ├── dashboard/                # Dashboard pages
+│   │   └── page.tsx              # Main dashboard
+│   ├── pricing/                  # Pricing page
+│   │   └── page.tsx
+│   ├── layout.tsx                # Root layout with providers
+│   ├── page.tsx                  # Landing page
+│   ├── globals.css               # Global styles
+│   └── favicon.ico
+├── components/                   # React components
+│   ├── ui/                       # Reusable UI components
+│   │   └── button.tsx
+│   ├── navigation.tsx            # Main navigation
+│   └── session-provider.tsx     # NextAuth session wrapper
+├── lib/                          # Utility libraries
+│   ├── auth.ts                   # NextAuth configuration
+│   ├── prisma.ts                 # Prisma client instance
+│   └── stripe.ts                 # Stripe utilities
+├── prisma/                       # Database
+│   └── schema.prisma             # Database schema
+├── types/                        # TypeScript definitions
+│   └── next-auth.d.ts            # NextAuth type extensions
+├── public/                       # Static files
+├── .env                          # Environment variables (gitignored)
+├── .env.example                  # Env template
+├── .gitignore
+├── CLAUDE.md                     # This file
+├── README.md                     # User documentation
+├── next.config.ts                # Next.js config
+├── tailwind.config.ts            # Tailwind config
+├── tsconfig.json                 # TypeScript config
+└── package.json                  # Dependencies
 ```
 
-**Update this section when:**
-- Initial project structure is created
-- New major directories are added
-- Architecture patterns are established
+### Key Directories
+
+- **app/** - All pages and API routes (Next.js App Router)
+- **components/** - Reusable React components
+- **lib/** - Shared utilities and configurations
+- **prisma/** - Database schema and migrations
+- **types/** - TypeScript type definitions
 
 ---
 
@@ -189,11 +229,29 @@ git pull         # Ambiguous source
 
 ## Code Style & Conventions
 
-> **Status:** To be established based on chosen technology stack
+### Next.js & TypeScript Standards
+
+This project uses Next.js 14+ with TypeScript. Follow these conventions:
+
+**File naming:**
+- React components: PascalCase (`Button.tsx`, `Navigation.tsx`)
+- Utilities and hooks: camelCase (`auth.ts`, `stripe.ts`)
+- Pages: lowercase (`page.tsx`, `layout.tsx`)
+- API routes: lowercase (`route.ts`)
+
+**Component structure:**
+- Use functional components with TypeScript
+- Props should be properly typed with interfaces
+- Server components by default, use `'use client'` only when needed
+- Export components as default from pages, named exports from utilities
+
+**Code organization:**
+- Keep components small and focused
+- Extract repeated logic into custom hooks or utilities
+- Group related functionality in directories
+- Use barrel exports sparingly
 
 ### General Principles
-
-Regardless of technology chosen, follow these principles:
 
 1. **Simplicity over cleverness** - Write clear, readable code
 2. **Avoid over-engineering** - Don't add features not explicitly requested
@@ -273,31 +331,54 @@ Once a testing framework is chosen, document:
 
 ## Deployment
 
-> **Status:** Not yet configured
+### Recommended: Vercel
 
-### Deployment Process (Template)
+This Next.js application is optimized for Vercel deployment:
 
-When deployment is set up, document:
+1. **Push to GitHub:**
+   ```bash
+   git push origin main
+   ```
 
-1. **Deployment environments:**
-   - Development
-   - Staging
-   - Production
+2. **Import in Vercel:**
+   - Go to vercel.com
+   - Import your GitHub repository
+   - Vercel auto-detects Next.js
 
-2. **Deployment methods:**
-   - Manual deployment steps
-   - Automated CI/CD pipelines
-   - Container orchestration
+3. **Configure Environment Variables:**
+   Add all variables from `.env` in Vercel dashboard:
+   - DATABASE_URL
+   - NEXTAUTH_URL (your production URL)
+   - NEXTAUTH_SECRET
+   - GOOGLE_CLIENT_ID/SECRET
+   - All STRIPE_* variables
 
-3. **Pre-deployment checklist:**
-   - Tests passing
-   - Code reviewed
-   - Documentation updated
-   - Version bumped
+4. **Deploy:**
+   - Vercel builds and deploys automatically
+   - Every push to main triggers redeployment
 
-4. **Rollback procedures:**
-   - How to rollback a failed deployment
-   - Recovery steps
+### Database Options
+
+**Production databases:**
+- **Vercel Postgres** - Native integration
+- **Supabase** - PostgreSQL with extras
+- **Railway** - Simple PostgreSQL hosting
+- **PlanetScale** - Serverless (requires MySQL adapter)
+
+After choosing, update DATABASE_URL and run:
+```bash
+npx prisma migrate deploy
+```
+
+### Pre-Deployment Checklist
+
+- [ ] Environment variables configured
+- [ ] Database migrations run
+- [ ] Stripe webhooks configured for production URL
+- [ ] Google OAuth redirect URIs updated
+- [ ] NEXTAUTH_URL set to production domain
+- [ ] Build succeeds locally (`npm run build`)
+- [ ] .env is gitignored (never commit secrets)
 
 ---
 
@@ -393,69 +474,142 @@ When deployment is set up, document:
 
 ## Common Tasks
 
-### Initial Project Setup (Pending)
-
-When setting up the project for the first time:
-
-1. **Choose technology stack**
-   - Decide on primary language/framework
-   - Document the choice and rationale in README.md
-   - Update this CLAUDE.md with stack-specific information
-
-2. **Initialize project structure**
-   - Create directory structure
-   - Add configuration files
-   - Set up dependency management
-   - Update "Codebase Structure" section above
-
-3. **Set up development tools**
-   - Linters and formatters
-   - Testing framework
-   - Build tools
-   - CI/CD pipelines
-
-4. **Create documentation**
-   - Expand README.md with setup instructions
-   - Add inline code documentation
-   - Create API documentation if needed
-   - Add CONTRIBUTING.md if open source
-
-5. **Security setup**
-   - Add `.gitignore` to exclude sensitive files
-   - Set up environment variable management
-   - Configure security scanning tools
-   - Add dependency vulnerability checking
-
-### Future Common Tasks (Template)
-
-Once the project is active, document common tasks here:
+### Development Workflow
 
 **Running the application locally:**
 ```bash
-# Commands to start the application
+npm run dev
+# Opens at http://localhost:3000
 ```
 
-**Building the project:**
+**Building for production:**
 ```bash
-# Commands to build
+npm run build
+npm start
 ```
 
-**Running tests:**
+**Linting:**
 ```bash
-# Commands to run tests
+npm run lint
 ```
 
-**Database operations:**
+### Database Operations
+
+**Generate Prisma client:**
 ```bash
-# Migration commands
-# Seeding commands
+npx prisma generate
 ```
 
-**Debugging:**
+**Create a migration:**
 ```bash
-# How to enable debug mode
-# Where to find logs
+npx prisma migrate dev --name description_of_changes
 ```
+
+**Apply migrations to production:**
+```bash
+npx prisma migrate deploy
+```
+
+**Open Prisma Studio (database GUI):**
+```bash
+npx prisma studio
+# Opens at http://localhost:5555
+```
+
+**Reset database (development only):**
+```bash
+npx prisma migrate reset
+```
+
+### Stripe Management
+
+**Test webhooks locally:**
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+# Copy the webhook signing secret to .env
+```
+
+**Create test products:**
+1. Go to Stripe Dashboard → Products
+2. Create products for each tier
+3. Add monthly recurring prices
+4. Copy Price IDs to .env
+
+### Common Modifications
+
+**Adding a new page:**
+1. Create `app/your-page/page.tsx`
+2. Add route to navigation if needed
+3. Update sitemap/SEO as needed
+
+**Adding a new API endpoint:**
+1. Create `app/api/your-endpoint/route.ts`
+2. Export GET, POST, etc. functions
+3. Add authentication if needed
+4. Update types if necessary
+
+**Adding a database model:**
+1. Edit `prisma/schema.prisma`
+2. Run `npx prisma migrate dev --name add_model_name`
+3. Update relevant API routes and pages
+4. Generate new Prisma client
+
+**Customizing authentication:**
+1. Edit `lib/auth.ts` for NextAuth config
+2. Modify `app/api/auth/[...nextauth]/route.ts` if needed
+3. Update UI in `app/auth/signin` or `signup`
+
+### SaaS-Specific Tasks
+
+**Adding a new subscription tier:**
+1. Create product/price in Stripe dashboard
+2. Copy Price ID to .env
+3. Update `app/pricing/page.tsx`
+4. Update Prisma schema if new features needed
+5. Update dashboard to show tier-specific features
+
+**Restricting features by plan:**
+```typescript
+// In your component or API route
+const subscription = await prisma.subscription.findFirst({
+  where: { userId: session.user.id }
+})
+
+if (subscription.plan === 'free') {
+  // Restrict access
+}
+```
+
+**Managing user subscriptions:**
+- Users can upgrade/downgrade via Stripe billing portal
+- Access via "Manage Subscription" button (implement in dashboard)
+- Uses `/api/create-portal-session` endpoint
+
+### Debugging
+
+**Check environment variables:**
+```bash
+# Ensure all required vars are set
+cat .env
+```
+
+**View logs:**
+- Development: Check terminal running `npm run dev`
+- Production (Vercel): Vercel dashboard → Your project → Logs
+
+**Database issues:**
+```bash
+# Check connection
+npx prisma db pull
+
+# View current schema
+npx prisma studio
+```
+
+**Authentication issues:**
+- Check NEXTAUTH_SECRET is set
+- Verify NEXTAUTH_URL matches current domain
+- Check OAuth credentials are correct
 
 ---
 
