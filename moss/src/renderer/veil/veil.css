@@ -1,0 +1,171 @@
+/* The break veil: a translucent green wash over every screen. */
+
+html,
+body {
+  background: transparent;
+  overflow: hidden;
+}
+
+body {
+  --veil: 0.62;
+  display: grid;
+  place-items: center;
+  animation: veil-in var(--dur-calm) var(--ease-out) both;
+}
+
+body.leaving {
+  animation: veil-out var(--dur-large) var(--ease-in) both;
+}
+
+@keyframes veil-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes veil-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.tint {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 46% 52% at 50% 50%, rgb(3 44 28 / calc(var(--veil) * 0.75)), transparent 100%),
+    linear-gradient(180deg, rgb(20 112 74 / var(--veil)), rgb(8 82 54 / calc(var(--veil) + 0.08)));
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+  animation: rise var(--dur-calm) var(--ease-out) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+
+.dial {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(46vh, 60vw);
+  height: min(46vh, 60vw);
+}
+
+.breath {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(234 243 235 / 0.14), rgb(234 243 235 / 0.03) 68%, transparent 72%);
+  box-shadow: inset 0 0 0 1px rgb(234 243 235 / 0.1);
+  transform: scale(0.66);
+  transition: transform 6s var(--ease-in-out);
+}
+
+.breath.in {
+  transform: scale(1);
+  transition-duration: 4s;
+}
+
+.center {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.kicker {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgb(234 243 235 / 0.82);
+}
+
+.time {
+  font-family: var(--font-display);
+  font-size: min(13vh, 15vw);
+  font-weight: 200;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--text-1);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: min(5.4vh, 7vw);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+
+.time:empty,
+.title:empty,
+.breath-label:empty {
+  display: none;
+}
+
+.breath-label {
+  font-size: 17px;
+  color: rgb(234 243 235 / 0.82);
+}
+
+.tip {
+  max-width: 30em;
+  min-height: 1.4em;
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--text-1);
+  text-wrap: balance;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.pill-btn {
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 22px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-1);
+  background: rgb(234 243 235 / 0.14);
+  box-shadow: inset 0 0 0 0.5px rgb(234 243 235 / 0.2);
+  transition:
+    background-color var(--dur-micro) ease,
+    transform var(--dur-micro) ease;
+}
+
+.pill-btn:hover {
+  background: rgb(234 243 235 / 0.22);
+}
+
+.pill-btn:active {
+  transform: scale(0.97);
+}
+
+.pill-btn.primary {
+  color: var(--forest-900);
+  background: var(--text-1);
+  box-shadow: none;
+}
+
+.pill-btn.primary:hover {
+  background: #ffffff;
+}
+
+.pill-btn:empty {
+  display: none;
+}

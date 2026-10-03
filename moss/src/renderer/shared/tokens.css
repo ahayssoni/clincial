@@ -1,0 +1,146 @@
+/* Moss design tokens. Forest greens tuned in OKLCH (hue ~150-162), one warm accent. */
+:root {
+  color-scheme: dark;
+
+  --forest-950: #03120b;
+  --forest-900: #071c12;
+  --forest-850: #0d261b;
+  --forest-800: #163225;
+  --forest-700: #274838;
+
+  --text-1: #eaf3eb;
+  --text-2: #afc4b5;
+  --text-3: #81998a;
+
+  --lichen: #abe1b2; /* focus */
+  --sage: #6fb789;
+  --meadow: #2a9d67; /* breaks */
+  --meadow-soft: #9fe3bb;
+  --meadow-deep: #055c3e;
+  --amber: #edc382; /* final minute, grace, goal reached */
+  --rest: #9aa9a0; /* paused */
+
+  --hairline: rgb(234 243 235 / 0.08);
+  --hairline-strong: rgb(234 243 235 / 0.14);
+  --fill-1: rgb(234 243 235 / 0.06);
+  --fill-2: rgb(234 243 235 / 0.1);
+  --fill-3: rgb(234 243 235 / 0.16);
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-small: 200ms;
+  --dur-medium: 320ms;
+  --dur-large: 600ms;
+  --dur-calm: 1400ms;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --shadow-float: 0 12px 28px -8px rgb(1 10 6 / 0.6), 0 2px 6px rgb(1 10 6 / 0.35);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: default;
+  -webkit-app-region: no-drag;
+}
+
+svg {
+  display: block;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--lichen);
+  outline-offset: 2px;
+}
+
+/* Round icon button used across surfaces. */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-2);
+  transition: background-color var(--dur-micro) ease, color var(--dur-micro) ease, transform var(--dur-micro) ease;
+}
+
+.icon-btn:hover {
+  background: var(--fill-2);
+  color: var(--text-1);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-btn.primary {
+  background: var(--fill-2);
+  color: var(--text-1);
+}
+
+.icon-btn.primary:hover {
+  background: var(--fill-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

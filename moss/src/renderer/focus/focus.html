@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+    <title>Moss</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="focus.css" />
+  </head>
+  <body data-mood="ready">
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+    <header class="top chrome">
+      <div class="clock">
+        <span class="tabular" id="now"></span>
+        <span id="date"></span>
+      </div>
+      <nav class="tools">
+        <button class="icon-btn" id="move" hidden></button>
+        <button class="icon-btn" id="settings"></button>
+        <button class="icon-btn" id="close"></button>
+      </nav>
+    </header>
+
+    <main class="stage">
+      <p class="phase"><span id="phase">Focus</span><span class="cycle" id="cycle"></span></p>
+
+      <div class="dial">
+        <div class="breath" id="breath" aria-hidden="true"></div>
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="track" cx="100" cy="100" r="96" />
+          <circle class="arc" id="arc" cx="100" cy="100" r="96" pathLength="100" />
+        </svg>
+        <div class="center">
+          <div class="time tabular" id="time" role="timer">25:00</div>
+          <input id="intention" type="text" maxlength="120" spellcheck="false" autocomplete="off" placeholder="What are you reading?" aria-label="What are you reading?" />
+          <p class="breath-label" id="breathLabel" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <p class="tip" id="tip"></p>
+
+      <div class="controls chrome">
+        <button class="icon-btn" id="reset"></button>
+        <button class="icon-btn play" id="toggle"></button>
+        <button class="icon-btn" id="skip"></button>
+      </div>
+    </main>
+
+    <footer class="today">
+      <div class="goal" id="goal" aria-hidden="true"></div>
+      <span id="todayText"></span>
+    </footer>
+
+    <script type="module" src="focus.js"></script>
+  </body>
+</html>

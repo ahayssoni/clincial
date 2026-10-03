@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+    <title>Moss Settings</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <header class="titlebar"><span>Moss</span></header>
+
+    <main class="content">
+      <section class="today" aria-label="Today">
+        <div class="stat">
+          <p class="stat-label">Focused today</p>
+          <p class="stat-value tabular" id="todayValue">0 min</p>
+          <p class="stat-sub" id="todaySub"></p>
+        </div>
+        <figure class="week" id="week" role="img"></figure>
+      </section>
+
+      <h2>Rhythm</h2>
+      <div class="group">
+        <div class="row">
+          <span>Preset</span>
+          <div class="segmented" id="preset" role="radiogroup" aria-label="Preset"></div>
+        </div>
+        <div class="row"><span>Focus</span><div class="stepper" data-key="focusMin" data-min="5" data-max="180" data-step="5" data-unit="min"></div></div>
+        <div class="row"><span>Short break</span><div class="stepper" data-key="shortMin" data-min="1" data-max="30" data-step="1" data-unit="min"></div></div>
+        <div class="row"><span>Long break</span><div class="stepper" data-key="longMin" data-min="5" data-max="60" data-step="5" data-unit="min"></div></div>
+        <div class="row"><span>Long break after</span><div class="stepper" data-key="longEvery" data-min="2" data-max="8" data-step="1" data-unit="sessions"></div></div>
+        <div class="row"><span>Daily goal</span><div class="stepper" data-key="dailyGoal" data-min="1" data-max="16" data-step="1" data-unit="sessions"></div></div>
+      </div>
+
+      <h2>Breaks</h2>
+      <div class="group">
+        <div class="row"><span>Start breaks automatically</span><button class="switch" role="switch" data-key="autoStartBreaks"></button></div>
+        <div class="row"><span>Start focus after a break</span><button class="switch" role="switch" data-key="autoStartFocus"></button></div>
+        <div class="row">
+          <span>Green veil over every screen<small>Covers your screens during breaks so you actually rest.</small></span>
+          <button class="switch" role="switch" data-key="veil"></button>
+        </div>
+        <div class="row" data-needs="veil">
+          <span>Veil strength</span>
+          <input class="slider" type="range" data-key="veilStrength" min="0.2" max="0.9" step="0.01" aria-label="Veil strength" />
+        </div>
+      </div>
+
+      <h2>Sound</h2>
+      <div class="group">
+        <div class="row"><span>Chimes</span><button class="switch" role="switch" data-key="chimes"></button></div>
+        <div class="row">
+          <span>Ambience</span>
+          <div class="segmented" id="ambience" role="radiogroup" aria-label="Ambience"></div>
+        </div>
+        <div class="row">
+          <span>Volume</span>
+          <input class="slider" type="range" data-key="volume" min="0" max="1" step="0.01" aria-label="Volume" />
+        </div>
+        <div class="row" data-needs="ambience"><span>Keep playing during breaks</span><button class="switch" role="switch" data-key="ambienceInBreaks"></button></div>
+      </div>
+
+      <h2>Timer &amp; displays</h2>
+      <div class="group">
+        <div class="row">
+          <span>Quiet while reading<small>Fades the floating timer and hides seconds until you hover.</small></span>
+          <button class="switch" role="switch" data-key="fadeWidget"></button>
+        </div>
+        <div class="row">
+          <span>Focus display</span>
+          <div class="inline">
+            <select id="display" aria-label="Screen for the focus display"></select>
+            <button class="text-btn" id="openFocus"></button>
+          </div>
+        </div>
+        <div class="row" data-platform="darwin"><span>Show time in the menu bar</span><button class="switch" role="switch" data-key="menuBarTime"></button></div>
+        <div class="row"><span>Open at login</span><button class="switch" role="switch" data-key="openAtLogin"></button></div>
+      </div>
+
+      <footer class="foot">
+        <p id="shortcut"></p>
+        <p>Double-click the floating timer to make it smaller. Right-click it for more.</p>
+        <button class="text-btn quiet" id="quit">Quit Moss</button>
+      </footer>
+    </main>
+
+    <script type="module" src="settings.js"></script>
+  </body>
+</html>

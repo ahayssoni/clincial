@@ -1,0 +1,378 @@
+/* Full-screen focus display, meant for a second monitor. */
+
+body {
+  --accent: var(--lichen);
+  --dial: min(54vh, 70vw);
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  background: var(--forest-950);
+  transition: background-color var(--dur-calm) var(--ease-in-out);
+  animation: arrive var(--dur-large) var(--ease-out);
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+body[data-mood='break'] {
+  --accent: var(--meadow-soft);
+  background: #04301f;
+}
+
+body[data-mood='paused'] {
+  --accent: var(--rest);
+}
+
+body[data-mood='final'],
+body[data-mood='grace'] {
+  --accent: var(--amber);
+}
+
+body.idle {
+  cursor: none;
+}
+
+/* Slow ambient light. Transform-only so it stays cheap. */
+.aurora {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.aurora i {
+  position: absolute;
+  width: 90vmax;
+  height: 90vmax;
+  border-radius: 50%;
+  opacity: 0.55;
+  transition: opacity var(--dur-calm) ease;
+  will-change: transform;
+}
+
+.aurora i:nth-child(1) {
+  left: -35vmax;
+  top: -45vmax;
+  background: radial-gradient(circle, rgb(39 92 64 / 0.55), transparent 62%);
+  animation: drift-a 70s var(--ease-in-out) infinite alternate;
+}
+
+.aurora i:nth-child(2) {
+  right: -40vmax;
+  bottom: -50vmax;
+  background: radial-gradient(circle, rgb(5 92 62 / 0.45), transparent 60%);
+  animation: drift-b 90s var(--ease-in-out) infinite alternate;
+}
+
+.aurora i:nth-child(3) {
+  left: 20vw;
+  top: 30vh;
+  width: 60vmax;
+  height: 60vmax;
+  background: radial-gradient(circle, rgb(171 225 178 / 0.07), transparent 60%);
+  animation: drift-c 110s var(--ease-in-out) infinite alternate;
+}
+
+body[data-mood='break'] .aurora i:nth-child(1) {
+  background: radial-gradient(circle, rgb(42 157 103 / 0.5), transparent 62%);
+}
+
+body[data-mood='break'] .aurora i:nth-child(3) {
+  background: radial-gradient(circle, rgb(159 227 187 / 0.14), transparent 60%);
+}
+
+@keyframes drift-a {
+  to {
+    transform: translate(18vw, 14vh) scale(1.08);
+  }
+}
+
+@keyframes drift-b {
+  to {
+    transform: translate(-16vw, -12vh) scale(1.12);
+  }
+}
+
+@keyframes drift-c {
+  to {
+    transform: translate(-22vw, 10vh) scale(0.9);
+  }
+}
+
+/* Chrome (fades away while you work) */
+.chrome {
+  transition: opacity var(--dur-large) ease;
+}
+
+body.idle .chrome {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 32px 0;
+}
+
+.clock {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--text-3);
+  font-size: 15px;
+}
+
+.clock #now {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.tools {
+  display: flex;
+  gap: 6px;
+}
+
+.tools .icon-btn {
+  width: 36px;
+  height: 36px;
+}
+
+.tools .icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Stage */
+.stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--dial) * 0.06);
+}
+
+.phase {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: clamp(15px, calc(var(--dial) * 0.04), 22px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-2);
+}
+
+.cycle {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.dial {
+  position: relative;
+  width: var(--dial);
+  height: var(--dial);
+}
+
+.dial svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.dial circle {
+  fill: none;
+  stroke-width: 1.6;
+}
+
+.dial .track {
+  stroke: var(--fill-1);
+}
+
+.dial .arc {
+  stroke: var(--accent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: 0;
+  transition:
+    stroke-dashoffset 1s linear,
+    stroke var(--dur-calm) ease;
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--dial) * 0.025);
+}
+
+.time {
+  font-family: var(--font-display);
+  font-size: calc(var(--dial) * 0.24);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--text-1);
+  transition: color var(--dur-large) ease;
+}
+
+body[data-mood='paused'] .time {
+  color: var(--text-2);
+}
+
+#intention {
+  width: 78%;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: clamp(14px, calc(var(--dial) * 0.038), 22px);
+  text-align: center;
+  text-overflow: ellipsis;
+  transition:
+    background-color var(--dur-small) ease,
+    opacity var(--dur-medium) ease;
+}
+
+#intention::placeholder {
+  color: var(--text-3);
+  opacity: 0.8;
+}
+
+#intention:hover {
+  background: var(--fill-1);
+}
+
+#intention:focus {
+  background: var(--fill-2);
+  color: var(--text-1);
+  outline: none;
+}
+
+body[data-mood='break'] #intention {
+  display: none;
+}
+
+.breath-label {
+  display: none;
+  font-size: clamp(14px, calc(var(--dial) * 0.038), 22px);
+  color: var(--text-2);
+}
+
+body[data-mood='break'] .breath-label {
+  display: block;
+}
+
+/* Breathing disc, visible only in breaks: 4s in, 6s out. */
+.breath {
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(159 227 187 / 0.16), rgb(159 227 187 / 0.04) 70%);
+  opacity: 0;
+  transform: scale(0.66);
+  transition:
+    transform 6s var(--ease-in-out),
+    opacity var(--dur-calm) ease;
+}
+
+body[data-mood='break'] .breath {
+  opacity: 1;
+}
+
+.breath.in {
+  transform: scale(1);
+  transition-duration: 4s, var(--dur-calm);
+}
+
+.tip {
+  min-height: 1.5em;
+  max-width: 34em;
+  font-size: clamp(15px, calc(var(--dial) * 0.036), 21px);
+  color: var(--text-2);
+  text-align: center;
+  opacity: 0;
+  transition: opacity var(--dur-calm) ease;
+}
+
+body[data-mood='break'] .tip {
+  opacity: 1;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.controls .icon-btn {
+  width: 48px;
+  height: 48px;
+}
+
+.controls .icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.controls .play {
+  width: 64px;
+  height: 64px;
+  background: var(--fill-2);
+  color: var(--text-1);
+}
+
+.controls .play svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Today */
+.today {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px 36px;
+  font-size: 14px;
+  color: var(--text-3);
+}
+
+.goal {
+  display: flex;
+  gap: 7px;
+}
+
+.goal i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fill-2);
+}
+
+.goal i.done {
+  background: var(--lichen);
+}
+
+.goal i.extra {
+  background: var(--amber);
+}

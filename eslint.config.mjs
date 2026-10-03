@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Moss is a standalone Electron app with its own package.json.
+    "moss/**",
   ]),
 ]);
 

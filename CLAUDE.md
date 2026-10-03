@@ -119,6 +119,7 @@ clincial/
 - **lib/** - Shared utilities and configurations
 - **prisma/** - Database schema and migrations
 - **types/** - TypeScript type definitions
+- **moss/** - Standalone Electron desktop app (a Pomodoro timer for reading). Not part of the Next.js build; it has its own `package.json`, tests (`npm test`) and README. Root ESLint ignores it.
 
 ---
 
