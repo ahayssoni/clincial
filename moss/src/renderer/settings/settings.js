@@ -82,7 +82,21 @@ function segmented(root, items, isOn, onPick) {
       return b;
     }),
   );
-  root.render = () => root.querySelectorAll('button').forEach((b) => b.setAttribute('aria-checked', String(isOn(b.dataset.value))));
+  root.render = () =>
+    root.querySelectorAll('button').forEach((b) => {
+      b.setAttribute('aria-checked', String(isOn(b.dataset.value)));
+      b.tabIndex = isOn(b.dataset.value) ? 0 : -1;
+    });
+  // Radio-group keys: arrows move the choice, one Tab stop for the group.
+  root.addEventListener('keydown', (e) => {
+    const dir = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!dir) return;
+    e.preventDefault();
+    const buttons = [...root.querySelectorAll('button')];
+    const next = buttons[(buttons.indexOf(document.activeElement) + dir + buttons.length) % buttons.length];
+    next.focus();
+    next.click();
+  });
 }
 
 const matches = (p) => Object.entries(p.values).every(([k, v]) => s.settings[k] === v);
@@ -119,7 +133,8 @@ connect((next) => {
 });
 
 function render() {
-  if (customOpen === null) customOpen = !PRESETS.some(matches);
+  if (!PRESETS.some(matches)) customOpen = true; // also catches changes made elsewhere
+  else if (customOpen === null) customOpen = false;
   document.querySelectorAll('[data-custom]').forEach((row) => (row.hidden = !customOpen));
   const { focusMin, shortMin } = s.settings;
   $('#presetSummary').textContent = customOpen ? '' : `${focusMin} min focus · ${shortMin} min breaks`;

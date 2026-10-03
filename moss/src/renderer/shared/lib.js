@@ -63,7 +63,8 @@ export function goalDots(el, s, max) {
   if (el.children.length !== count) el.replaceChildren(...Array.from({ length: count }, () => document.createElement('i')));
   const live = s.phase === 'focus' && !s.grace && s.status !== 'idle';
   [...el.children].forEach((dot, i) => {
-    dot.className = i < Math.min(sessions, goal) ? 'done' : i < sessions ? 'extra' : live && i === sessions ? 'now' : '';
+    const kind = i < Math.min(sessions, goal) ? 'done' : i < sessions ? 'extra' : live && i === sessions ? 'now' : '';
+    if (dot.className !== kind) dot.className = kind;
   });
 }
 
@@ -145,12 +146,17 @@ export const BREATH = { inhale: 4000, exhale: 6000 };
 export function breathing(el, label) {
   let timer = null;
   let running = false;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const say = (text) => {
+    label.textContent = text;
+    if (!calm.matches) label.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: 'ease-out' });
+  };
   const cycle = () => {
-    label.textContent = 'Breathe in';
+    say('Breathe in');
     el.classList.remove('out');
     el.classList.add('in');
     timer = setTimeout(() => {
-      label.textContent = 'Breathe out';
+      say('Breathe out');
       el.classList.remove('in');
       el.classList.add('out');
       timer = setTimeout(cycle, BREATH.exhale);

@@ -124,6 +124,16 @@ body.leaving {
   color: var(--text-1);
 }
 
+.tip {
+  max-width: 30em;
+  min-height: 1.4em;
+  margin-top: var(--space-2);
+  font-size: clamp(18px, 2.3vh, 24px);
+  line-height: 1.4;
+  color: var(--text-1);
+  text-wrap: balance;
+}
+
 /* After the break: no disc, just a quiet line and a way back. */
 body[data-state='ready'] .dial {
   display: none;
@@ -137,16 +147,6 @@ body[data-state='ready'] .title {
 body[data-state='ready'] .tip {
   margin-top: var(--space-3);
   color: var(--text-2);
-}
-
-.tip {
-  max-width: 30em;
-  min-height: 1.4em;
-  margin-top: var(--space-2);
-  font-size: clamp(18px, 2.3vh, 24px);
-  line-height: 1.4;
-  color: var(--text-1);
-  text-wrap: balance;
 }
 
 .actions {

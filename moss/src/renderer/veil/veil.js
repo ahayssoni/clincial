@@ -62,6 +62,7 @@ function render() {
     title.textContent = 'Ready when you are.';
     tip.textContent = s.intention ? `Back to ${s.intention.replace(/[.!?…]+$/, '')}.` : '';
     breath.stop();
+    breathLabel.textContent = '';
     setActions(['Later', 'dismissVeil'], ['Start focus', 'start'], true);
   } else {
     kicker.textContent = phaseName(s);

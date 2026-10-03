@@ -84,14 +84,14 @@ body {
   stroke: var(--fill-2);
 }
 
+/* No dashoffset transition: at this size the arc moves a fraction of a pixel
+   per second, and animating it would repaint at 60fps all session long. */
 .ring .arc {
   stroke: var(--accent);
   stroke-linecap: round;
   stroke-dasharray: 100 100;
   stroke-dashoffset: 0;
-  transition:
-    stroke-dashoffset 1s linear,
-    stroke var(--dur-large) ease;
+  transition: stroke var(--dur-large) ease;
 }
 
 .core {

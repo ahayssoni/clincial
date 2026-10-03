@@ -224,7 +224,6 @@ function prefs(extra = {}) {
     contextIsolation: true,
     nodeIntegration: false,
     sandbox: true,
-    backgroundThrottling: false,
     spellcheck: false,
     ...extra,
   };
@@ -246,7 +245,8 @@ function createSoundWindow() {
     width: 200,
     height: 100,
     skipTaskbar: true,
-    webPreferences: prefs({ autoplayPolicy: 'no-user-gesture-required' }),
+    // Hidden but must keep scheduling audio on time.
+    webPreferences: prefs({ autoplayPolicy: 'no-user-gesture-required', backgroundThrottling: false }),
   });
   load(win.sound, 'sound');
 }

@@ -50,7 +50,8 @@ function render(instant) {
 
   renderDots();
   // Hints only while idle, so a tooltip never pops up mid-session.
-  pill.title = s.status === 'idle' ? 'Drag to move · Double-click to shrink · Right-click for settings' : '';
+  const hint = s.status === 'idle' ? 'Drag to move · Double-click to shrink · Right-click for settings' : '';
+  if (pill.title !== hint) pill.title = hint;
   setIcon(toggle, s.status === 'running' ? 'pause' : 'play', s.status === 'running' ? 'Pause' : 'Start');
   setIcon(skip, 'skip', s.phase === 'focus' && !s.grace ? 'Skip to break' : 'Skip break');
   setIcon(expand, 'display', s.focusDisplay ? 'Close focus display' : 'Open focus display');

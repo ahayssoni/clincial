@@ -122,9 +122,16 @@ intention.addEventListener('keydown', (e) => {
   }
 });
 
+// Like native macOS buttons, a click does not move focus, so Space keeps
+// meaning start/pause for mouse users. Keyboard users can still Tab to them.
+document.addEventListener('mousedown', (e) => {
+  if (e.target.closest('button') && document.activeElement !== intention) e.preventDefault();
+});
+
+// Space starts or pauses, unless a focused button should get it.
 document.addEventListener('keydown', (e) => {
   if (e.target === intention) return;
-  if (e.key === ' ') {
+  if (e.key === ' ' && !e.target.closest('button')) {
     e.preventDefault();
     moss.act('toggle');
   } else if (e.key === 'Escape') {

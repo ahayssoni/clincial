@@ -196,6 +196,11 @@ body.idle .chrome {
     stroke var(--dur-calm) ease;
 }
 
+/* Quiet mode: the screen goes fully still between updates. */
+body.idle .dial .arc {
+  transition: stroke var(--dur-calm) ease;
+}
+
 .center {
   position: absolute;
   inset: 0;
@@ -269,12 +274,14 @@ body[data-mood='paused'] .time {
   background: var(--fill-2);
   color: var(--text-1);
   outline: none;
+  box-shadow: 0 0 0 1.5px rgb(171 225 178 / 0.6);
 }
 
 body[data-mood='break'] #intention {
   display: none;
 }
 
+/* Same height as the intention field it replaces, so nothing shifts. */
 .breath-label {
   display: none;
   padding: 6px 0;
