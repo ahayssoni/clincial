@@ -1,0 +1,97 @@
+name: Moss
+
+# Builds the Moss desktop app on real macOS and Windows machines, smoke-tests
+# the packaged app on each, and publishes the installers as a GitHub Release.
+on:
+  push:
+    paths:
+      - "moss/**"
+      - ".github/workflows/moss.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: moss-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: --mac
+            installer: dist/Moss-mac.dmg
+          - os: windows-latest
+            target: --win
+            installer: dist/Moss-Windows-Setup.exe
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: moss
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: moss/package-lock.json
+
+      - run: npm ci
+
+      - run: npm test
+
+      - name: Package
+        run: npx electron-builder ${{ matrix.target }} --publish never
+
+      - name: Smoke test the packaged app
+        run: node scripts/smoke.js
+
+      - name: Upload smoke screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-${{ matrix.os }}
+          path: moss/smoke-output/
+          if-no-files-found: ignore
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.os }}
+          path: moss/${{ matrix.installer }}
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installer-*
+          path: out
+          merge-multiple: true
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./moss/package.json').version")
+          TAG="moss-v$VERSION"
+          # One release per version; a rebuild replaces it so the links stay the same.
+          gh release delete "$TAG" --cleanup-tag --yes || true
+          gh release create "$TAG" out/Moss-mac.dmg out/Moss-Windows-Setup.exe \
+            --target "$GITHUB_SHA" \
+            --title "Moss $VERSION" \
+            --notes-file moss/RELEASE_NOTES.md \
+            --latest
