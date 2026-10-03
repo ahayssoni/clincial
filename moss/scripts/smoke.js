@@ -78,7 +78,7 @@ async function main() {
   await sampleCpu(app); // first sample primes the counters
   await wait(10000);
   const idle = await sampleCpu(app);
-  metrics.cpuWhileFocusingPct = idle.cpu;
+  metrics.cpuWhileFocusingPct = `${idle.cpu} (${idle.busiest})`;
   metrics.memoryMb = idle.memoryMb;
   await widget.mouse.move(120, 44);
   await wait(400);
@@ -94,7 +94,8 @@ async function main() {
   metrics.focusDisplayFrames = await framePacing(focus, 3000);
   await sampleCpu(app);
   await wait(5000);
-  metrics.cpuWithFocusDisplayPct = (await sampleCpu(app)).cpu;
+  const withFocus = await sampleCpu(app);
+  metrics.cpuWithFocusDisplayPct = `${withFocus.cpu} (${withFocus.busiest})`;
   await focus.screenshot({ path: path.join(OUT, 'focus-display.png') });
   await focus.evaluate(() => window.moss.closeFocusDisplay());
   await wait(800);
@@ -169,11 +170,18 @@ async function veilWindows(app) {
 }
 
 async function sampleCpu(app) {
-  return app.evaluate(({ app: electronApp }) => {
+  return app.evaluate(({ app: electronApp, webContents }) => {
+    const pages = new Map(webContents.getAllWebContents().map((wc) => [wc.getOSProcessId(), wc.getURL().split('/').pop().replace('.html', '')]));
     const all = electronApp.getAppMetrics();
     const cpu = all.reduce((sum, p) => sum + p.cpu.percentCPUUsage, 0);
     const memoryMb = all.reduce((sum, p) => sum + p.memory.workingSetSize, 0) / 1024;
-    return { cpu: Math.round(cpu * 10) / 10, memoryMb: Math.round(memoryMb) };
+    const busiest = all
+      .map((p) => ({ label: pages.get(p.pid) || p.name || p.type, cpu: p.cpu.percentCPUUsage }))
+      .sort((a, b) => b.cpu - a.cpu)
+      .slice(0, 3)
+      .map((p) => `${p.label} ${Math.round(p.cpu * 10) / 10}%`)
+      .join(', ');
+    return { cpu: Math.round(cpu * 10) / 10, memoryMb: Math.round(memoryMb), busiest };
   });
 }
 
@@ -209,11 +217,11 @@ function report(metrics, errors) {
   const rows = [
     ['Startup to first paint', `${metrics.startupMs} ms`],
     ['Start/pause round trip', `${metrics.actionLatencyMs} ms`],
-    ['CPU while focusing (all processes)', `${metrics.cpuWhileFocusingPct}%`],
+    ['CPU % while focusing (all processes; busiest)', metrics.cpuWhileFocusingPct],
     ['Memory, working set incl. shared (all processes)', `${metrics.memoryMb} MB`],
     ['Focus display open', `${metrics.focusDisplayOpenMs} ms`],
     ['Focus display frames', `${metrics.focusDisplayFrames.fps} fps, p95 ${metrics.focusDisplayFrames.p95FrameMs} ms, ${metrics.focusDisplayFrames.longFrames} long`],
-    ['CPU with focus display', `${metrics.cpuWithFocusDisplayPct}%`],
+    ['CPU % with focus display (busiest)', metrics.cpuWithFocusDisplayPct],
     ['Veil after session end', `${metrics.veilDelayMs} ms`],
     ['Veil frames', `${metrics.veilFrames.fps} fps, p95 ${metrics.veilFrames.p95FrameMs} ms, ${metrics.veilFrames.longFrames} long`],
   ];

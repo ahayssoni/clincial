@@ -68,10 +68,12 @@ jobs:
           path: moss/${{ matrix.installer }}
           if-no-files-found: error
 
+  # Every push builds and smoke-tests. Only a commit whose message contains
+  # [release] (or a manual run) replaces the public download links.
   release:
     name: Publish release
     needs: build
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
