@@ -54,6 +54,19 @@ export function mood(s, rem) {
   return rem <= 60000 ? 'final' : 'focus';
 }
 
+// Today's sessions against the daily goal, one dot each: done, past the goal
+// (extra), and the session in progress (now). Same meaning on every surface.
+export function goalDots(el, s, max) {
+  const { sessions } = s.today;
+  const goal = s.settings.dailyGoal;
+  const count = Math.min(max, Math.max(goal, sessions));
+  if (el.children.length !== count) el.replaceChildren(...Array.from({ length: count }, () => document.createElement('i')));
+  const live = s.phase === 'focus' && !s.grace && s.status !== 'idle';
+  [...el.children].forEach((dot, i) => {
+    dot.className = i < Math.min(sessions, goal) ? 'done' : i < sessions ? 'extra' : live && i === sessions ? 'now' : '';
+  });
+}
+
 // A progress ring drawn with an SVG circle using pathLength="100".
 // Progress animates linearly between once-per-second updates.
 export function ring(circle) {
@@ -86,7 +99,7 @@ export const icons = {
   display: `<svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="2.2" ${stroke}/>${path('M9 20h6M12 16.5V20', stroke)}</svg>`,
   close: `<svg viewBox="0 0 24 24">${path('M6.5 6.5l11 11M17.5 6.5l-11 11', stroke)}</svg>`,
   sliders: `<svg viewBox="0 0 24 24">${path('M4 7.5h9M18 7.5h2M4 16.5h3M11 16.5h9', stroke)}<circle cx="15.5" cy="7.5" r="2.3" ${stroke}/><circle cx="8.5" cy="16.5" r="2.3" ${stroke}/></svg>`,
-  next: `<svg viewBox="0 0 24 24">${path('M9 5.5l6.5 6.5L9 18.5', stroke)}</svg>`,
+  move: `<svg viewBox="0 0 24 24">${path('M13 4.5H5.2A2.2 2.2 0 0 0 3 6.7v7.6a2.2 2.2 0 0 0 2.2 2.2h13.6a2.2 2.2 0 0 0 2.2-2.2V12', stroke)}${path('M9 20h6M12 16.5V20M16 7.5h5M18.5 5l2.5 2.5L18.5 10', stroke)}</svg>`,
 };
 
 export function setIcon(button, name, label) {
@@ -98,22 +111,26 @@ export function setIcon(button, name, label) {
   if (label) button.title = label;
 }
 
-// Small reading-friendly break prompts. Eye rest first: readers need it most.
+// Short break prompts for students. Mostly eye and body resets (screens all
+// day), with one retrieval prompt in each rotation: recalling without notes
+// is one of the best-supported study habits.
 const TIPS = {
   short: [
     'Look at something far away for twenty seconds.',
     'Let your shoulders drop. Unclench your jaw.',
+    'Without looking, recall the three main ideas from that session.',
     'Close your eyes and take three slow breaths.',
-    'Take a sip of water.',
+    'Have some water.',
     'Stand up and stretch your back.',
-    'Blink slowly a few times. Your eyes will thank you.',
+    'Blink slowly a few times and rest your eyes.',
   ],
   long: [
-    'Take a short walk. Leave the book behind.',
-    'Step outside for some air if you can.',
-    'Make a cup of tea and drink it slowly.',
-    'Lie down for a few minutes. Let your mind wander.',
-    'Tell someone about what you just read.',
+    'Step away from your desk for a few minutes.',
+    'Get some fresh air if you can.',
+    'Without your notes, sum up what you covered in a sentence or two.',
+    'Refill your water and have a snack.',
+    'Take a short walk. Let your mind wander.',
+    'Lie down for a few minutes and close your eyes.',
   ],
 };
 

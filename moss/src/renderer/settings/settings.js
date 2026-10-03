@@ -2,16 +2,17 @@ import { $, connect, duration } from '../shared/lib.js';
 
 const moss = window.moss;
 let s = null;
+let customOpen = null; // the rhythm steppers, shown only for a custom rhythm
 
 const PRESETS = [
   { label: 'Classic', values: { focusMin: 25, shortMin: 5, longMin: 15, longEvery: 4 } },
-  { label: 'Deep reading', values: { focusMin: 50, shortMin: 10, longMin: 20, longEvery: 3 } },
+  { label: 'Deep study', values: { focusMin: 50, shortMin: 10, longMin: 20, longEvery: 3 } },
 ];
 const AMBIENCES = [
   ['off', 'Off'],
   ['rain', 'Rain'],
   ['brown', 'Brown noise'],
-  ['drift', 'Drift'],
+  ['drift', 'Soft tones'],
 ];
 const WEEKDAY = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const WEEKDAY_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -30,9 +31,10 @@ document.querySelectorAll('[data-platform]').forEach((el) => {
 document.querySelectorAll('.stepper').forEach((el) => {
   const { key, unit } = el.dataset;
   const [min, max, step] = ['min', 'max', 'step'].map((k) => Number(el.dataset[k]));
-  const down = Object.assign(document.createElement('button'), { textContent: '−', ariaLabel: 'Less' });
+  const name = el.previousElementSibling.textContent.trim();
+  const down = Object.assign(document.createElement('button'), { textContent: '−', ariaLabel: `Decrease ${name}` });
   const out = document.createElement('output');
-  const up = Object.assign(document.createElement('button'), { textContent: '+', ariaLabel: 'More' });
+  const up = Object.assign(document.createElement('button'), { textContent: '+', ariaLabel: `Increase ${name}` });
   el.append(down, out, up);
   const nudge = (dir) => {
     const value = s.settings[key];
@@ -87,8 +89,12 @@ const matches = (p) => Object.entries(p.values).every(([k, v]) => s.settings[k] 
 segmented(
   $('#preset'),
   [...PRESETS.map((p, i) => [String(i), p.label]), ['custom', 'Custom']],
-  (v) => (v === 'custom' ? !PRESETS.some(matches) : matches(PRESETS[v])),
-  (v) => v !== 'custom' && update(PRESETS[v].values),
+  (v) => (v === 'custom' ? customOpen : !customOpen && matches(PRESETS[v])),
+  (v) => {
+    customOpen = v === 'custom';
+    if (customOpen) render();
+    else update(PRESETS[v].values);
+  },
 );
 segmented(
   $('#ambience'),
@@ -113,6 +119,10 @@ connect((next) => {
 });
 
 function render() {
+  if (customOpen === null) customOpen = !PRESETS.some(matches);
+  document.querySelectorAll('[data-custom]').forEach((row) => (row.hidden = !customOpen));
+  const { focusMin, shortMin } = s.settings;
+  $('#presetSummary').textContent = customOpen ? '' : `${focusMin} min focus · ${shortMin} min breaks`;
   document.querySelectorAll('.stepper, .segmented').forEach((el) => el.render());
   document.querySelectorAll('.switch').forEach((el) => el.setAttribute('aria-checked', String(Boolean(s.settings[el.dataset.key]))));
   document.querySelectorAll('.slider').forEach((el) => {
@@ -121,7 +131,7 @@ function render() {
   });
   document.querySelectorAll('[data-needs]').forEach((row) => {
     const need = s.settings[row.dataset.needs];
-    row.classList.toggle('disabled', !need || need === 'off');
+    row.hidden = !need || need === 'off';
   });
 
   const select = $('#display');
@@ -133,15 +143,16 @@ function render() {
   if (select.selectedIndex < 0) select.value = '';
   $('#openFocus').textContent = s.focusDisplay ? 'Close' : 'Open';
 
-  $('#shortcut').innerHTML = `Press <kbd>${s.shortcut}</kbd> anywhere to start or pause.`;
+  const kbd = Object.assign(document.createElement('kbd'), { textContent: s.shortcut });
+  $('#shortcut').replaceChildren(...(s.shortcut ? ['Start or pause from anywhere with ', kbd, '.'] : []));
   renderToday();
 }
 
 function renderToday() {
   const { sessions, minutes } = s.today;
   $('#todayValue').textContent = duration(minutes);
-  $('#todaySub').textContent =
-    sessions >= s.settings.dailyGoal ? `${sessions} sessions · goal reached` : `${sessions} of ${s.settings.dailyGoal} sessions`;
+  const goal = s.settings.dailyGoal;
+  $('#todaySub').textContent = sessions >= goal ? `${sessions} sessions · goal reached` : sessions ? `${sessions} of ${goal} sessions` : `Goal: ${goal} sessions`;
 
   const week = $('#week');
   const peak = Math.max(s.settings.focusMin * s.settings.dailyGoal, ...s.week.map((d) => d.minutes));
@@ -154,7 +165,8 @@ function renderToday() {
       const bar = document.createElement('div');
       bar.className = isToday ? 'bar today-bar' : 'bar';
       const fill = document.createElement('i');
-      fill.style.height = `${d.minutes ? Math.max(4, (d.minutes / peak) * 100) : 0}%`;
+      // Never shorter than its width, so a small day still reads as a capsule.
+      fill.style.height = `${d.minutes ? Math.max(23, (d.minutes / peak) * 100) : 0}%`;
       bar.append(fill);
       const letter = document.createElement('span');
       letter.className = 'letter';

@@ -165,7 +165,7 @@ function onPhaseChange(prev) {
     if (prev.grace) return;
     chime('rest');
     if (!settings.veil || state.status !== 'running') {
-      notify('Time for a break', state.status === 'running' ? 'Look away from the page for a bit.' : 'Start your break when you are ready.');
+      notify('Time for a break', state.status === 'running' ? 'Look away from your screen for a bit.' : 'Start your break when you’re ready.');
     }
     return;
   }
@@ -277,7 +277,7 @@ function createWidget() {
     skipTaskbar: true,
     hasShadow: false,
     show: false,
-    // Clicking the timer should not pull focus away from what you are reading.
+    // Clicking the timer should not pull focus away from what you are studying.
     focusable: !canClickThrough,
     ...(isMac ? { type: 'panel' } : {}),
     webPreferences: prefs(),

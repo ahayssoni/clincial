@@ -1,8 +1,8 @@
 # Moss
 
-A calm Pomodoro timer for reading. It floats above whatever you are reading,
-covers your screens in a soft green veil when it is time to rest, and can turn
-a second monitor into a quiet full-screen focus display.
+A calm Pomodoro timer for studying. It floats above your notes, slides and
+problem sets, covers your screens in a soft green veil when it is time to rest,
+and can turn a second monitor into a quiet full-screen focus display.
 
 Runs on macOS and Windows (Electron). No accounts, no network, no tracking.
 Everything is stored in one JSON file on your machine.
@@ -37,12 +37,12 @@ time. On Windows, SmartScreen may ask you to confirm with **More info → Run an
 
 | | |
 |---|---|
-| **Floating timer** | Always on top, even over full-screen apps on macOS. Clicks pass through everything except the pill itself. Hover for controls, double-click to shrink it to a ring, right-click for the menu. |
-| **Quiet while reading** | While focus runs, the timer fades and shows whole minutes only, so nothing flickers in the corner of your eye. Seconds come back on hover and in the final minute. |
-| **Break veil** | When a break starts, every screen gets a translucent green wash with a breathing guide and a small rest prompt. |
-| **Finish the page** | When the veil drops mid-paragraph, take two more minutes. Once per break. |
-| **Focus display** | Full screen on the monitor of your choice (by default, the one without the floating timer). Shows the time, what you are reading, and today's progress. Click the line under the timer to write what you are reading. |
-| **Sound** | Soft chimes at each transition. Optional ambience while you focus: rain, brown noise, or Drift (a slow pad). All synthesized, no audio files. |
+| **Floating timer** | Always on top, even over full-screen apps on macOS. Clicks pass through everything except the pill itself. Hover for controls, double-click to shrink it to a ring, right-click for the menu. The dots are today's sessions toward your daily goal. |
+| **Quiet mode** | While focus runs, the floating timer dims and shows whole minutes only, so nothing flickers in the corner of your eye. The focus display does the same once the mouse is still, and its background stops drifting. Seconds come back on hover (or mouse move) and in the final minute. |
+| **Break veil** | When a break starts, every screen gets a translucent green wash with a breathing guide and a short rest prompt (eye and body resets, and now and then a quick recall of what you just studied). The middle of the veil stays deep green so the text is readable over a white page; *Veil strength* sets how much of your screen shows through around it. |
+| **Finish this thought** | When the veil arrives mid-problem, take two more minutes. Once per break. |
+| **Focus display** | Full screen on the monitor of your choice (by default, the one without the floating timer). Shows the time, what you are studying, and today's progress. Click the line under the timer to write what you are studying. |
+| **Sound** | Soft chimes at each transition. Optional ambience while you focus: rain, brown noise, or soft tones (a slow synth pad). All synthesized, no audio files. |
 | **Today** | Sessions and minutes per day, a daily goal, and the last seven days in Settings. A session counts toward the goal if you did at least half of it. |
 
 ### Shortcuts
@@ -52,14 +52,14 @@ time. On Windows, SmartScreen may ask you to confirm with **More info → Run an
 | `⌘⌥⇧P` / `Ctrl+Alt+Shift+P` | Start or pause from anywhere |
 | `Space` | Start or pause (focus display) |
 | `Esc` | Close the focus display |
-| `Enter` | Save what you are reading and start (focus display) |
+| `Enter` | Save what you are studying and start (focus display) |
 
 ### Presets
 
 - **Classic**: 25 min focus, 5 min break, 15 min long break every 4 sessions.
-- **Deep reading**: 50 / 10, with a 20 min long break every 3 sessions.
+- **Deep study**: 50 / 10, with a 20 min long break every 3 sessions.
 
-Everything is adjustable in Settings.
+Choose **Custom** in Settings to set each length yourself.
 
 ## Your data
 

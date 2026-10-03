@@ -7,22 +7,19 @@
     <link rel="stylesheet" href="../shared/tokens.css" />
     <link rel="stylesheet" href="veil.css" />
   </head>
-  <body data-mood="break">
+  <body>
     <div class="tint" aria-hidden="true"></div>
-    <main class="card">
+    <main class="card" id="card">
+      <p class="meta"><span id="kicker">Short break</span><span class="time tabular" id="time" role="timer"></span></p>
       <div class="dial">
         <div class="breath" id="breath" aria-hidden="true"></div>
-        <div class="center">
-          <p class="kicker" id="kicker">Short break</p>
-          <div class="time tabular" id="time" role="timer"></div>
-          <p class="title" id="title"></p>
-          <p class="breath-label" id="breathLabel" aria-live="polite"></p>
-        </div>
+        <p class="breath-label" id="breathLabel" aria-live="polite"></p>
       </div>
+      <h1 class="title" id="title"></h1>
       <p class="tip" id="tip"></p>
       <div class="actions">
         <button class="pill-btn" id="secondary"></button>
-        <button class="pill-btn primary" id="primary"></button>
+        <button class="pill-btn" id="primary"></button>
       </div>
     </main>
     <script type="module" src="veil.js"></script>

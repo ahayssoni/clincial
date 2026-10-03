@@ -1,11 +1,10 @@
-/* Full-screen focus display, meant for a second monitor. */
+/* Full-screen focus display, meant for a second monitor. The dial sits a
+   little above the middle (the optical centre); everything else hangs off it. */
 
 body {
   --accent: var(--lichen);
-  --dial: min(54vh, 70vw);
+  --dial: min(50vh, 64vw);
   position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
   overflow: hidden;
   background: var(--forest-950);
   transition: background-color var(--dur-calm) var(--ease-in-out);
@@ -36,7 +35,8 @@ body.idle {
   cursor: none;
 }
 
-/* Slow ambient light. Transform-only so it stays cheap. */
+/* Slow ambient light. Transform-only so it stays cheap, and frozen while you
+   study so nothing moves at the edge of your vision. */
 .aurora {
   position: absolute;
   inset: 0;
@@ -53,6 +53,10 @@ body.idle {
   opacity: 0.55;
   transition: opacity var(--dur-calm) ease;
   will-change: transform;
+}
+
+body.idle .aurora i {
+  animation-play-state: paused;
 }
 
 .aurora i:nth-child(1) {
@@ -114,31 +118,27 @@ body.idle .chrome {
   pointer-events: none;
 }
 
+/* The right padding is trimmed by half a button minus half a glyph, so the
+   close glyph lines up with the clock's left inset. */
 .top {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 32px 0;
+  padding: var(--space-6) calc(var(--space-8) - 9px) 0 var(--space-8);
 }
 
 .clock {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  color: var(--text-3);
-  font-size: 15px;
-}
-
-.clock #now {
-  color: var(--text-2);
+  font-size: var(--text-base);
   font-weight: 500;
+  color: var(--text-2);
 }
 
 .tools {
   display: flex;
-  gap: 6px;
+  gap: var(--space-1);
 }
 
 .tools .icon-btn {
@@ -155,29 +155,14 @@ body.idle .chrome {
 .stage {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: calc(var(--dial) * 0.06);
-}
-
-.phase {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  font-size: clamp(15px, calc(var(--dial) * 0.04), 22px);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  color: var(--text-2);
-}
-
-.cycle {
-  color: var(--text-3);
-  font-weight: 400;
+  display: grid;
+  grid-template-rows: minmax(0, 0.85fr) auto minmax(0, 1.15fr);
+  justify-items: center;
+  height: 100%;
 }
 
 .dial {
+  grid-row: 2;
   position: relative;
   width: var(--dial);
   height: var(--dial);
@@ -218,21 +203,43 @@ body.idle .chrome {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--dial) * 0.025);
+  gap: calc(var(--dial) * 0.02);
+}
+
+.phase {
+  font-size: clamp(14px, calc(var(--dial) * 0.036), 22px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-2);
 }
 
 .time {
   font-family: var(--font-display);
-  font-size: calc(var(--dial) * 0.24);
+  font-size: calc(var(--dial) * 0.25);
   font-weight: 200;
   line-height: 1;
   letter-spacing: -0.035em;
   color: var(--text-1);
+  white-space: nowrap;
   transition: color var(--dur-large) ease;
+}
+
+/* Quiet mode: whole minutes, unit set small. */
+.time small {
+  margin-left: 0.12em;
+  font-size: 0.3em;
+  font-weight: 300;
+  letter-spacing: 0;
+  color: var(--text-2);
 }
 
 body[data-mood='paused'] .time {
   color: var(--text-2);
+}
+
+#intention,
+.breath-label {
+  font-size: clamp(15px, calc(var(--dial) * 0.04), 24px);
 }
 
 #intention {
@@ -242,8 +249,7 @@ body[data-mood='paused'] .time {
   padding: 6px 10px;
   background: transparent;
   color: var(--text-2);
-  font: inherit;
-  font-size: clamp(14px, calc(var(--dial) * 0.038), 22px);
+  font-family: inherit;
   text-align: center;
   text-overflow: ellipsis;
   transition:
@@ -253,7 +259,6 @@ body[data-mood='paused'] .time {
 
 #intention::placeholder {
   color: var(--text-3);
-  opacity: 0.8;
 }
 
 #intention:hover {
@@ -272,7 +277,7 @@ body[data-mood='break'] #intention {
 
 .breath-label {
   display: none;
-  font-size: clamp(14px, calc(var(--dial) * 0.038), 22px);
+  padding: 6px 0;
   color: var(--text-2);
 }
 
@@ -302,29 +307,47 @@ body[data-mood='break'] .breath {
   transition-duration: 4s, var(--dur-calm);
 }
 
-.tip {
-  min-height: 1.5em;
-  max-width: 34em;
-  font-size: clamp(15px, calc(var(--dial) * 0.036), 21px);
-  color: var(--text-2);
-  text-align: center;
-  opacity: 0;
-  transition: opacity var(--dur-calm) ease;
+/* Reduced motion: the disc holds still; the words carry the rhythm. */
+@media (prefers-reduced-motion: reduce) {
+  .breath,
+  .breath.in {
+    transform: scale(0.82);
+  }
 }
 
-body[data-mood='break'] .tip {
-  opacity: 1;
+/* Below the dial: the break tip, then the controls. */
+.below {
+  grid-row: 3;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding-top: clamp(20px, 3.2vh, 48px);
+}
+
+.tip {
+  max-width: 34em;
+  font-size: clamp(16px, 2vh, 22px);
+  line-height: 1.4;
+  color: var(--text-1);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.tip:empty {
+  display: none;
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: var(--space-5);
 }
 
 .controls .icon-btn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
 }
 
 .controls .icon-btn svg {
@@ -333,8 +356,8 @@ body[data-mood='break'] .tip {
 }
 
 .controls .play {
-  width: 64px;
-  height: 64px;
+  width: clamp(52px, 6.4vh, 64px);
+  height: clamp(52px, 6.4vh, 64px);
   background: var(--fill-2);
   color: var(--text-1);
 }
@@ -346,31 +369,36 @@ body[data-mood='break'] .tip {
 
 /* Today */
 .today {
-  position: relative;
+  position: absolute;
+  inset: auto 0 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 16px 32px 36px;
-  font-size: 14px;
+  gap: var(--space-3);
+  padding: 0 var(--space-8) clamp(24px, 4vh, 48px);
+  font-size: clamp(14px, 1.5vh, 17px);
   color: var(--text-3);
 }
 
 .goal {
   display: flex;
-  gap: 7px;
+  gap: var(--space-2);
 }
 
 .goal i {
-  width: 7px;
-  height: 7px;
+  width: var(--space-2);
+  height: var(--space-2);
   border-radius: 50%;
   background: var(--fill-2);
 }
 
 .goal i.done {
   background: var(--lichen);
+}
+
+.goal i.now {
+  background: color-mix(in srgb, var(--lichen) 40%, transparent);
 }
 
 .goal i.extra {

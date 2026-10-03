@@ -6,7 +6,7 @@
 // phase:     'focus' | 'short' | 'long'
 // status:    'idle' | 'running' | 'paused'
 // completed: focus sessions finished in the current cycle (resets after a long break)
-// grace:     true while running the short "finish the page" extension before a break
+// grace:     true while running the short "finish this thought" extension before a break
 // pending:   the break a grace period is holding back
 // graceUsed: the current break has already been postponed once
 
@@ -92,7 +92,7 @@ function complete(s, settings, now) {
   return enter({ ...s, completed }, 'focus', settings, now, settings.autoStartFocus);
 }
 
-// "Finish the page": hold a break back for two minutes of extra focus. Once per break.
+// "Finish this thought": hold a break back for two minutes of extra focus. Once per break.
 function canPostpone(s) {
   return s.phase !== 'focus' && !s.graceUsed && !s.grace;
 }

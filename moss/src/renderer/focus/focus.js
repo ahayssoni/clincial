@@ -1,10 +1,9 @@
-import { $, connect, remaining, clock, duration, phaseName, mood, ring, setIcon, tipFor, breathing } from '../shared/lib.js';
+import { $, connect, remaining, clock, minutesLeft, duration, phaseName, mood, ring, setIcon, tipFor, breathing, goalDots } from '../shared/lib.js';
 
 const moss = window.moss;
 const body = document.body;
 const time = $('#time');
 const phase = $('#phase');
-const cycle = $('#cycle');
 const intention = $('#intention');
 const tip = $('#tip');
 const goal = $('#goal');
@@ -12,15 +11,17 @@ const todayText = $('#todayText');
 const toggle = $('#toggle');
 const arc = ring($('#arc'));
 const breath = breathing($('#breath'), $('#breathLabel'));
+const calm = matchMedia('(prefers-reduced-motion: reduce)');
 
 let s = null;
 let breakSeed = 0;
+let lastKey = '';
 
 setIcon($('#reset'), 'reset', 'Reset');
 setIcon($('#skip'), 'skip', 'Skip');
 setIcon($('#settings'), 'sliders', 'Settings');
 setIcon($('#close'), 'close', 'Close focus display (Esc)');
-setIcon($('#move'), 'next', 'Move to the next display');
+setIcon($('#move'), 'move', 'Move to the next display');
 
 connect((next) => {
   const prev = s;
@@ -38,13 +39,12 @@ function render(instant) {
   const m = mood(s, rem);
   body.dataset.mood = m;
 
-  time.textContent = clock(rem);
+  renderTime(rem);
   arc.set(s.durationMs ? rem / s.durationMs : 0, { instant });
-  phase.textContent = phaseName(s);
-  cycle.textContent = s.phase === 'focus' && !s.grace ? `Session ${Math.min(s.completed + 1, s.settings.longEvery)} of ${s.settings.longEvery}` : '';
+  phase.textContent = phaseText(s);
 
   if (m === 'break') {
-    tip.textContent = s.status === 'idle' ? 'Start your break when you are ready.' : tipFor(s, breakSeed);
+    tip.textContent = s.status === 'idle' ? 'Start your break when you’re ready.' : tipFor(s, breakSeed);
   } else {
     tip.textContent = '';
   }
@@ -59,25 +59,37 @@ function render(instant) {
   renderClock();
 }
 
+// Quiet mode: while focus runs and the screen is idle, whole minutes only.
+function renderTime(rem) {
+  const quiet = s.settings.fadeWidget && s.status === 'running' && s.phase === 'focus' && body.classList.contains('idle') && rem > 60000;
+  const key = quiet ? `q${minutesLeft(rem)}` : clock(rem);
+  if (key === lastKey) return;
+  const swapped = lastKey !== '' && lastKey.startsWith('q') !== quiet;
+  if (quiet) time.innerHTML = `${minutesLeft(rem)}<small>min</small>`;
+  else time.textContent = clock(rem);
+  lastKey = key;
+  if (swapped && !calm.matches) time.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: 'ease-out' });
+}
+
+function phaseText(st) {
+  const name = phaseName(st);
+  if (st.status === 'paused') return `${name} · paused`;
+  if (st.phase === 'focus' && !st.grace && st.completed + 1 >= st.settings.longEvery) return `${name} · long break next`;
+  return name;
+}
+
 function renderToday() {
   const { sessions, minutes } = s.today;
   const target = s.settings.dailyGoal;
-  const count = Math.min(24, Math.max(target, sessions));
-  if (goal.children.length !== count) goal.replaceChildren(...Array.from({ length: count }, () => document.createElement('i')));
-  [...goal.children].forEach((dot, i) => {
-    dot.className = i < Math.min(sessions, target) ? 'done' : i < sessions ? 'extra' : '';
-  });
+  goalDots(goal, s, 24);
   const spent = minutes ? ` · ${duration(minutes)}` : '';
   todayText.textContent =
-    sessions >= target ? `Daily goal reached${spent}` : sessions ? `${sessions} of ${target} sessions today${spent}` : `Goal: ${target} sessions today`;
+    sessions >= target ? `Daily goal reached${spent}` : sessions ? `${sessions} of ${target} sessions today${spent}` : `Today’s goal: ${target} sessions`;
 }
 
 const timeFmt = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
-const dateFmt = new Intl.DateTimeFormat(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
 function renderClock() {
-  const now = new Date();
-  $('#now').textContent = timeFmt.format(now);
-  $('#date').textContent = dateFmt.format(now);
+  $('#now').textContent = timeFmt.format(new Date());
 }
 
 // Controls
@@ -92,7 +104,7 @@ $('#move').addEventListener('click', () => {
   moss.openFocusDisplay(ids[(here + 1) % ids.length]);
 });
 
-// Intention: what you are reading. Saved on Enter or when you click away.
+// Intention: what you are studying. Saved on Enter or when you click away.
 function commitIntention() {
   const value = intention.value.trim();
   if (value !== (s?.intention || '')) moss.setIntention(value);

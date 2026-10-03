@@ -11,15 +11,17 @@ body {
   padding: 14px 20px 26px;
 }
 
+/* Insets are concentric: the ring sits 8px from the top, bottom and left
+   edge; the last 32px button sits 14px from the right (60 - 32) / 2. */
 .pill {
   --accent: var(--lichen);
   position: relative;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: var(--space-3);
   width: 272px;
   height: 60px;
-  padding: 0 10px 0 8px;
+  padding: 0 14px 0 var(--space-2);
   border-radius: 30px;
   overflow: hidden;
   background: linear-gradient(180deg, rgb(24 54 40 / 0.96), rgb(8 30 20 / 0.96));
@@ -40,8 +42,9 @@ body {
   transition-duration: var(--dur-small), var(--dur-medium), var(--dur-medium), var(--dur-large);
 }
 
+/* Quiet mode at rest. 0.72 keeps the digits above 4.5:1 on a white page. */
 .pill.resting {
-  opacity: 0.55;
+  opacity: 0.72;
 }
 
 .pill[data-mood='break'] {
@@ -95,8 +98,8 @@ body {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 8px;
-  height: 8px;
+  width: var(--space-2);
+  height: var(--space-2);
   border-radius: 50%;
   background: var(--accent);
   transition:
@@ -117,7 +120,7 @@ body {
   display: grid;
   place-items: center;
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: var(--text-base);
   font-weight: 600;
   letter-spacing: -0.02em;
   opacity: 0;
@@ -130,7 +133,7 @@ body {
   flex-direction: column;
   flex: none;
   min-width: 0;
-  width: 92px;
+  width: 84px;
   transition: opacity var(--dur-small) ease;
 }
 
@@ -141,14 +144,16 @@ body {
   line-height: 26px;
   letter-spacing: -0.015em;
   white-space: nowrap;
+  transition:
+    transform var(--dur-small) var(--ease-out),
+    color var(--dur-large) ease;
 }
 
 .time small {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0;
-  color: var(--text-2);
   margin-left: 3px;
+  font-size: var(--text-md);
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .pill[data-mood='paused'] .time {
@@ -156,15 +161,28 @@ body {
 }
 
 .label {
-  font-size: 11.5px;
-  line-height: 15px;
-  color: var(--text-3);
+  font-size: var(--text-sm);
+  line-height: 16px;
+  color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: opacity var(--dur-small) ease;
 }
 
-/* Tail: cycle dots at rest, controls on hover. Same space, cross-faded. */
+/* At rest the label goes and the time settles to the middle of the pill. */
+.pill.resting .label {
+  opacity: 0;
+  transition-duration: var(--dur-calm);
+}
+
+.pill.resting .time {
+  transform: translateY(8px);
+  transition-duration: var(--dur-calm);
+  transition-timing-function: var(--ease-in-out);
+}
+
+/* Tail: today's goal dots at rest, controls on hover. Same space, cross-faded. */
 .tail {
   position: relative;
   flex: 1;
@@ -184,9 +202,10 @@ body {
     transform var(--dur-medium) var(--ease-out);
 }
 
+/* Dots end where the last control's glyph ends. */
 .dots {
-  gap: 5px;
-  padding-right: 8px;
+  gap: var(--space-1);
+  padding-right: var(--space-2);
 }
 
 .dots i {
@@ -205,17 +224,26 @@ body {
   background: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
+.dots i.extra {
+  background: var(--amber);
+}
+
+/* Goals too long for dots read as a count. */
+.dots.count {
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
 .controls {
-  gap: 2px;
-  --btn: 30px;
   opacity: 0;
   transform: translateX(6px);
   pointer-events: none;
 }
 
 .controls .icon-btn {
-  width: var(--btn);
-  height: var(--btn);
+  width: 32px;
+  height: 32px;
 }
 
 .pill.hover .controls,
@@ -236,7 +264,7 @@ body {
 /* Compact: just the ring, minutes inside. Double-click to switch. */
 .pill.compact {
   width: 60px;
-  padding: 0 8px;
+  padding: 0 var(--space-2);
 }
 
 .pill.compact .readout,

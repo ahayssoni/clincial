@@ -1,4 +1,4 @@
-import { $, connect, remaining, clock, minutesLeft, statusLabel, mood, ring, setIcon } from '../shared/lib.js';
+import { $, connect, remaining, clock, minutesLeft, statusLabel, mood, ring, setIcon, goalDots } from '../shared/lib.js';
 
 const moss = window.moss;
 const pill = $('#pill');
@@ -32,7 +32,7 @@ function render(instant) {
   pill.dataset.mood = m;
   pill.classList.toggle('compact', Boolean(s.widgetCompact));
 
-  // Quiet mode: while reading, show whole minutes so nothing flickers in the
+  // Quiet mode: while you study, show whole minutes so nothing flickers in the
   // corner of your eye. Seconds come back on hover and in the final minute.
   const quiet = s.settings.fadeWidget && s.status === 'running' && !hovered && rem > 60000;
   const key = quiet ? `q${minutesLeft(rem)}` : clock(rem);
@@ -49,18 +49,20 @@ function render(instant) {
   pill.classList.toggle('resting', resting);
 
   renderDots();
+  // Hints only while idle, so a tooltip never pops up mid-session.
+  pill.title = s.status === 'idle' ? 'Drag to move · Double-click to shrink · Right-click for settings' : '';
   setIcon(toggle, s.status === 'running' ? 'pause' : 'play', s.status === 'running' ? 'Pause' : 'Start');
   setIcon(skip, 'skip', s.phase === 'focus' && !s.grace ? 'Skip to break' : 'Skip break');
   setIcon(expand, 'display', s.focusDisplay ? 'Close focus display' : 'Open focus display');
 }
 
 function renderDots() {
-  const total = s.settings.longEvery;
-  if (dots.children.length !== total) dots.replaceChildren(...Array.from({ length: total }, () => document.createElement('i')));
-  [...dots.children].forEach((dot, i) => {
-    dot.classList.toggle('done', i < s.completed);
-    dot.classList.toggle('now', i === s.completed && s.phase === 'focus');
-  });
+  const total = Math.max(s.settings.dailyGoal, s.today.sessions);
+  const asCount = total > 10;
+  dots.classList.toggle('count', asCount);
+  const count = `${s.today.sessions}/${s.settings.dailyGoal}`;
+  if (asCount && dots.textContent !== count) dots.textContent = count;
+  if (!asCount) goalDots(dots, s, 10);
 }
 
 toggle.addEventListener('click', () => moss.act('toggle'));

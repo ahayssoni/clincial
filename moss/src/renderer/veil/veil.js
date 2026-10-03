@@ -2,13 +2,16 @@ import { $, connect, remaining, clock, phaseName, tipFor, breathing } from '../s
 
 const moss = window.moss;
 const body = document.body;
+const card = $('#card');
 const kicker = $('#kicker');
 const time = $('#time');
 const title = $('#title');
 const tip = $('#tip');
+const breathLabel = $('#breathLabel');
 const primary = $('#primary');
 const secondary = $('#secondary');
-const breath = breathing($('#breath'), $('#breathLabel'));
+const breath = breathing($('#breath'), breathLabel);
+const calm = matchMedia('(prefers-reduced-motion: reduce)');
 
 let s = null;
 const seed = Math.floor(Math.random() * 1000);
@@ -27,40 +30,55 @@ function leave() {
   breath.stop();
 }
 
+// break (running) | paused | waiting (break not started) | ready (break over)
+function stateOf(st) {
+  if (st.phase === 'focus') return 'ready';
+  if (st.status === 'running') return 'break';
+  return st.status === 'paused' ? 'paused' : 'waiting';
+}
+
 function render() {
   body.style.setProperty('--veil', s.settings.veilStrength);
-  const rem = remaining(s);
-  const onBreak = s.phase !== 'focus';
+  const state = stateOf(s);
+  if (body.dataset.state !== state) {
+    // The break ending is a real change of scene: let the card settle in again.
+    if (body.dataset.state && !calm.matches) {
+      card.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 600, easing: 'ease-out' });
+    }
+    body.dataset.state = state;
+  }
 
-  if (onBreak && s.status === 'running') {
+  if (state === 'break') {
     kicker.textContent = phaseName(s);
-    time.textContent = clock(rem);
+    time.textContent = clock(remaining(s));
     title.textContent = '';
     tip.textContent = tipFor(s, seed);
     breath.start();
-    setActions(s.canPostpone ? ['Finish the page · 2 min', 'postpone'] : null, ['Back to focus', 'focusNow']);
-  } else if (onBreak) {
-    kicker.textContent = s.status === 'paused' ? `${phaseName(s)} · paused` : phaseName(s);
-    time.textContent = clock(rem);
-    title.textContent = '';
-    tip.textContent = 'Take your time.';
-    breath.stop();
-    setActions(['Back to focus', 'focusNow'], [s.status === 'paused' ? 'Resume break' : 'Start break', 'start']);
-  } else {
-    // The break is over and focus is waiting for you.
+    // Neither choice is primary: the default is to rest.
+    setActions(s.canPostpone ? ['Finish this thought · 2 min', 'postpone'] : null, ['Back to focus', 'focusNow'], false);
+  } else if (state === 'ready') {
     kicker.textContent = 'Break’s over';
     time.textContent = '';
     title.textContent = 'Ready when you are.';
-    tip.textContent = s.intention ? `Back to ${s.intention}.` : '';
+    tip.textContent = s.intention ? `Back to ${s.intention.replace(/[.!?…]+$/, '')}.` : '';
     breath.stop();
-    setActions(['Later', 'dismissVeil'], ['Start focus', 'start']);
+    setActions(['Later', 'dismissVeil'], ['Start focus', 'start'], true);
+  } else {
+    kicker.textContent = phaseName(s);
+    time.textContent = clock(remaining(s));
+    title.textContent = '';
+    tip.textContent = 'Take your time.';
+    breath.stop();
+    breathLabel.textContent = state === 'paused' ? 'Paused' : '';
+    setActions(['Back to focus', 'focusNow'], [state === 'paused' ? 'Resume break' : 'Start break', 'start'], true);
   }
 }
 
-function setActions(second, first) {
+function setActions(second, first, emphasize) {
   actions = { secondary: second?.[1], primary: first?.[1] };
   secondary.textContent = second?.[0] || '';
   primary.textContent = first?.[0] || '';
+  primary.classList.toggle('primary', emphasize);
 }
 
 primary.addEventListener('click', () => actions.primary && moss.act(actions.primary));
